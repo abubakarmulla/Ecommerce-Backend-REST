@@ -32,8 +32,10 @@ public class Cart {
     @JoinColumn(name = "fk_product_id")
     private Product prodId;
 
+    @Column(name = "cart_prod_name")
     private String prodName;
 
+    @Column(name = "cart_prod_cost")
     private long prodCost;
 
 }

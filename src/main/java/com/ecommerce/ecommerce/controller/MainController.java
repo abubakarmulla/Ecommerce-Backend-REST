@@ -8,6 +8,7 @@ import com.ecommerce.ecommerce.model.User;
 import com.ecommerce.ecommerce.services.AuthService;
 import com.ecommerce.ecommerce.services.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class MainController {
     UserService userService;
 
     @PostMapping("/register/user")
-    public ResponseEntity<String> resgisterUser(@RequestBody User user) {
+    public ResponseEntity<String> resgisterUser(@Valid @RequestBody User user) {
         return new ResponseEntity<String>(authService.registration(user),HttpStatus.CREATED);
     }
 
@@ -45,5 +46,5 @@ public class MainController {
     public ResponseEntity<User> updateByToken(@RequestHeader String token, @RequestBody User user) {
         return new ResponseEntity<User>(userService.updateUser(token, user),HttpStatus.ACCEPTED);
     }
-    
+
 }
