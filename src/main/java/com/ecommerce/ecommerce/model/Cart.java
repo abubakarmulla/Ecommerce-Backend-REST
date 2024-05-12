@@ -21,8 +21,8 @@ public class Cart {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "cart_id")
-    private UUID cartId;
+    @Column(name = "cart_item_id")
+    private UUID cartItemId;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_user_id")
