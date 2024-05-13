@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.ecommerce.dto.JwtTokenUtil;
 import com.ecommerce.ecommerce.exceptions.AuthorizationException;
+import com.ecommerce.ecommerce.exceptions.DuplicateResourceException;
 import com.ecommerce.ecommerce.exceptions.ResourceNotFoundException;
 import com.ecommerce.ecommerce.model.Cart;
 import com.ecommerce.ecommerce.model.Product;
@@ -39,11 +40,16 @@ public class CartServiceImpl implements CartService {
             User user = userRepository.findByuserName(tokenObj.getUserNameFromToken(token)).get();
             if (productRepository.existsById(prodId)) {
                 Product product = productRepository.findById(prodId).get();
-                cart.setProdId(product);
-                cart.setUserId(user);
-                cart.setProdName(product.getProdName());
-                cart.setProdCost(product.getProdCost());
-                return cartRepository.save(cart);
+                if (cartRepository.existsByUserIdAndProdId(user.getUserId(), prodId)) {
+                    throw new DuplicateResourceException("Product ID and User ID", "prodId and userId",
+                            prodId.toString() + " " + user.getUserId().toString());
+                } else {
+                    cart.setUserId(user.getUserId());
+                    cart.setProdId(product.getProdId());
+                    cart.setProdName(product.getProdName());
+                    cart.setProdCost(product.getProdCost());
+                    return cartRepository.save(cart);
+                }
             } else {
                 throw new ResourceNotFoundException("Product ID", "prodId", prodId);
             }
@@ -58,8 +64,7 @@ public class CartServiceImpl implements CartService {
             if (cartRepository.existsById(cartItemId)) {
                 cartRepository.deleteById(cartItemId);
                 return String.format("Cart Item with ID: %s has deleted successfully", cartItemId.toString());
-            }
-            else{
+            } else {
                 throw new ResourceNotFoundException("Cart Item ID", "cartItemId", cartItemId);
             }
         } else {
@@ -71,7 +76,7 @@ public class CartServiceImpl implements CartService {
     public List<Cart> getAllCartItems(String token) {
         if (tokenObj.verifyToken(token)) {
             User user = userRepository.findByuserName(tokenObj.getUserNameFromToken(token)).get();
-            return cartRepository.findAllByuserId(user).get();
+            return cartRepository.findAllByuserId(user.getUserId()).get();
         } else {
             throw new AuthorizationException("Invalid token, Login again");
         }
